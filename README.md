@@ -26,7 +26,7 @@ An interactive, bash script for quickly scaffolding production-ready Python proj
 2. **Navigate** to the directory:
 
    ```bash
-   cd gen_py
+   cd Ouroboros
    ```
 
 3. **Run the script**:
