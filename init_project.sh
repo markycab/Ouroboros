@@ -624,9 +624,25 @@ dmypy.json
 .env
 .env.local
 
+# Logs
+logs/*.log
+*.log
+!logs/.gitkeep
+
+# Build tracking (keep templates, ignore build outputs)
+build_tracking/*.zip
+build_tracking/*.exe
+build_tracking/*.dmg
+build_tracking/*.deb
+
 # OS
 .DS_Store
 Thumbs.db
+
+# PyInstaller
+*.spec.bak
+build/
+dist/
 EOF
     
     echo -e "${GREEN}✓ Git repository initialized${NC}"
@@ -647,6 +663,9 @@ mkdir -p app/utils
 mkdir -p cli
 mkdir -p tests
 mkdir -p pyinstaller
+mkdir -p docs
+mkdir -p logs
+mkdir -p build_tracking
 
 # Create __init__.py files
 touch app/__init__.py
@@ -663,15 +682,28 @@ cat > app/main.py << 'EOF'
 Main entry point for the application.
 CLI entry point - handles command-line interface.
 """
+from app.utils.logger import setup_logger
+
+# Initialize logger
+logger = setup_logger(__name__)
+
 
 def main():
     """Main function to run the application."""
+    logger.info("Application started")
+    
     print("Hello from your application!")
     # Add your main application logic here
+    
+    logger.info("Application finished successfully")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except Exception as e:
+        logger.error(f"Application error: {e}", exc_info=True)
+        raise
 EOF
 
 # Create engine files
@@ -744,6 +776,69 @@ Utility functions and helpers.
 """
 
 # Add your utility functions here
+EOF
+
+# Create logging configuration
+cat > app/utils/logger.py << 'EOF'
+"""
+Logging configuration for the application.
+"""
+import logging
+import os
+from pathlib import Path
+from datetime import datetime
+
+# Create logs directory if it doesn't exist
+LOGS_DIR = Path(__file__).parent.parent.parent / "logs"
+LOGS_DIR.mkdir(exist_ok=True)
+
+# Configure logging format
+LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+
+def setup_logger(name: str, level=logging.INFO):
+    """
+    Set up a logger with both file and console handlers.
+    
+    Args:
+        name: Logger name (usually __name__)
+        level: Logging level (default: INFO)
+    
+    Returns:
+        logging.Logger: Configured logger instance
+    """
+    logger = logging.getLogger(name)
+    logger.setLevel(level)
+    
+    # Prevent duplicate handlers
+    if logger.handlers:
+        return logger
+    
+    # Console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setLevel(level)
+    console_formatter = logging.Formatter(LOG_FORMAT, DATE_FORMAT)
+    console_handler.setFormatter(console_formatter)
+    
+    # File handler - daily log files
+    log_file = LOGS_DIR / f"app_{datetime.now().strftime('%Y%m%d')}.log"
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setLevel(level)
+    file_formatter = logging.Formatter(LOG_FORMAT, DATE_FORMAT)
+    file_handler.setFormatter(file_formatter)
+    
+    # Add handlers
+    logger.addHandler(console_handler)
+    logger.addHandler(file_handler)
+    
+    return logger
+
+
+# Example usage:
+# from app.utils.logger import setup_logger
+# logger = setup_logger(__name__)
+# logger.info("Application started")
+# logger.error("An error occurred")
 EOF
 
 # Create CLI files
@@ -885,36 +980,83 @@ cat > README.md << 'EOF'
 your_app/
 ├── app/
 │   ├── __init__.py
-│   ├── main.py              # CLI entry point
-│   ├── engine/              # CORE LOGIC (UI-agnostic)
+│   ├── main.py                 # CLI entry point
+│   ├── engine/                 # CORE LOGIC (UI-agnostic)
 │   │   ├── __init__.py
 │   │   ├── workflows.py
 │   │   ├── calculations.py
 │   │   └── models.py
-│   ├── services/            # I/O, DB, filesystem, APIs
-│   ├── config/
-│   └── utils/
+│   ├── services/               # I/O, DB, filesystem, APIs
+│   │   └── __init__.py
+│   ├── config/                 # Configuration management
+│   │   ├── __init__.py
+│   │   └── settings.py
+│   └── utils/                  # Utilities and helpers
+│       ├── __init__.py
+│       └── logger.py           # Logging configuration
 ├── cli/
-│   ├── commands.py          # argparse / typer / click
+│   ├── commands.py             # argparse / typer / click
 │   └── formatters.py
 ├── tests/
+│   └── test_example.py
+├── docs/                       # Documentation
+│   ├── README.md
+│   └── ARCHITECTURE.md
+├── logs/                       # Application logs (gitignored)
+├── build_tracking/             # Build history and tracking
+│   ├── BUILD_LOG.md
+│   └── VERSION_HISTORY.md
 ├── pyinstaller/
 │   └── app.spec
+├── CHANGELOG.md
+├── CONTRIBUTING.md
 └── pyproject.toml
 ```
 
 ## Getting Started
 
-1. Activate your virtual environment (if created)
-2. Install dependencies: `pip install -r requirements.txt`
-3. Run the application: `python app/main.py`
+### Installation
+
+1. Activate your virtual environment (if created):
+   ```bash
+   source venv/bin/activate  # Linux/macOS
+   venv\Scripts\activate     # Windows
+   ```
+
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Run the application:
+   ```bash
+   python app/main.py
+   ```
 
 ## Development
 
-- Run tests: `pytest`
-- Format code: `black app/ cli/ tests/`
-- Lint code: `flake8 app/ cli/ tests/`
-- Type check: `mypy app/ cli/`
+### Code Quality
+
+- **Run tests**: `pytest`
+- **Format code**: `black app/ cli/ tests/`
+- **Lint code**: `flake8 app/ cli/ tests/`
+- **Type check**: `mypy app/ cli/`
+- **Sort imports**: `isort app/ cli/ tests/`
+
+### Logging
+
+The application uses a centralized logging system. Logs are written to:
+- Console (stdout)
+- Daily log files in `logs/` directory
+
+Example usage:
+```python
+from app.utils.logger import setup_logger
+
+logger = setup_logger(__name__)
+logger.info("Application started")
+logger.error("An error occurred")
+```
 
 ## Building Executable
 
@@ -925,10 +1067,333 @@ pyinstaller pyinstaller/app.spec
 ```
 
 The executable will be in the `dist/` directory.
+
+### Build Tracking
+
+- Document builds in `build_tracking/BUILD_LOG.md`
+- Track versions in `build_tracking/VERSION_HISTORY.md`
+- Follow the build checklist before releases
+
+## Documentation
+
+Comprehensive documentation is available in the `docs/` directory:
+- **ARCHITECTURE.md** - System design and architecture
+- **CHANGELOG.md** - Version history (root directory)
+- **CONTRIBUTING.md** - Contribution guidelines (root directory)
+
+## Contributing
+
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+## License
+
+[Specify your license here]
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for a detailed history of changes.
+EOF
+
+# Create documentation files
+mkdir -p docs
+
+# Create docs/README.md
+cat > docs/README.md << 'EOF'
+# Documentation
+
+This directory contains project documentation.
+
+## Contents
+
+- **ARCHITECTURE.md** - System architecture and design decisions
+- **API.md** - API documentation (if applicable)
+- **CHANGELOG.md** - Version history and changes
+- **CONTRIBUTING.md** - Contribution guidelines
+- **DEPLOYMENT.md** - Deployment instructions
+
+## Building Documentation
+
+If using Sphinx or MkDocs, add build instructions here.
+EOF
+
+# Create ARCHITECTURE.md
+cat > docs/ARCHITECTURE.md << 'EOF'
+# Architecture
+
+## Overview
+
+Describe the overall architecture of your application.
+
+## Project Structure
+
+```
+your_app/
+├── app/               # Main application code
+│   ├── engine/       # Core business logic (UI-agnostic)
+│   ├── services/     # External integrations (DB, APIs, files)
+│   ├── config/       # Configuration management
+│   └── utils/        # Utility functions
+├── cli/              # Command-line interface
+├── tests/            # Test suite
+└── docs/             # Documentation
+```
+
+## Design Principles
+
+- **Separation of Concerns**: UI logic separated from business logic
+- **Testability**: Core logic is framework-agnostic
+- **Modularity**: Components are loosely coupled
+
+## Key Components
+
+### Engine
+Contains the core business logic and workflows that are independent of the UI layer.
+
+### Services
+Handles all external interactions:
+- Database operations
+- File I/O
+- API calls
+- External service integrations
+
+### Configuration
+Centralized configuration management for different environments.
+
+## Data Flow
+
+Describe how data flows through your application.
+
+## Dependencies
+
+List and justify major dependencies.
+EOF
+
+# Create CHANGELOG.md
+cat > CHANGELOG.md << 'EOF'
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+
+### Added
+- Initial project setup
+- Project structure created
+- Basic configuration files
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [0.1.0] - YYYY-MM-DD
+
+### Added
+- Initial release
+EOF
+
+# Create CONTRIBUTING.md
+cat > CONTRIBUTING.md << 'EOF'
+# Contributing Guidelines
+
+Thank you for considering contributing to this project!
+
+## How to Contribute
+
+### Reporting Bugs
+
+1. Check if the bug has already been reported
+2. Create a new issue with:
+   - Clear title and description
+   - Steps to reproduce
+   - Expected vs actual behavior
+   - System information
+
+### Suggesting Enhancements
+
+1. Check if the enhancement has been suggested
+2. Create a new issue describing:
+   - The problem you're solving
+   - Your proposed solution
+   - Alternative solutions considered
+
+### Pull Requests
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Run tests and linters
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+## Development Setup
+
+1. Clone the repository
+2. Create a virtual environment: `python -m venv venv`
+3. Activate virtual environment
+4. Install dependencies: `pip install -r requirements.txt`
+5. Install dev dependencies: `pip install -r requirements-dev.txt` (if exists)
+
+## Code Standards
+
+### Python Style Guide
+
+- Follow PEP 8
+- Use type hints where appropriate
+- Write docstrings for functions and classes
+- Maximum line length: 88 characters (Black default)
+
+### Testing
+
+- Write tests for new features
+- Maintain or improve code coverage
+- Run all tests before submitting PR: `pytest`
+
+### Code Quality
+
+Before submitting, ensure:
+- [ ] Tests pass: `pytest`
+- [ ] Code is formatted: `black .`
+- [ ] Linting passes: `flake8`
+- [ ] Type checking passes: `mypy .`
+- [ ] Imports are sorted: `isort .`
+
+## Commit Messages
+
+- Use clear and descriptive commit messages
+- Start with a verb in present tense (Add, Fix, Update, etc.)
+- Reference issue numbers when applicable
+
+Example:
+```
+Add user authentication feature (#123)
+
+- Implement login/logout endpoints
+- Add JWT token generation
+- Include unit tests
+```
+
+## Code Review Process
+
+1. Maintainers will review your PR
+2. Address any requested changes
+3. Once approved, your PR will be merged
+
+## Questions?
+
+Feel free to open an issue for any questions or concerns.
+EOF
+
+# Create build tracking files
+cat > build_tracking/BUILD_LOG.md << 'EOF'
+# Build Log
+
+Track your build history and issues here.
+
+## Build History
+
+### Build YYYY-MM-DD HH:MM
+
+- **Status**: Success/Failed
+- **Version**: 0.1.0
+- **Platform**: Windows/Linux/macOS
+- **Builder**: PyInstaller/cx_Freeze/etc.
+- **Output Size**: X MB
+- **Notes**: 
+
+### Issues Encountered
+
+- Issue 1: Description and resolution
+- Issue 2: Description and resolution
+
+## Build Checklist
+
+Before creating a release build:
+
+- [ ] All tests pass
+- [ ] Code is properly formatted and linted
+- [ ] Version number updated
+- [ ] CHANGELOG.md updated
+- [ ] Documentation updated
+- [ ] Dependencies reviewed and updated
+- [ ] Build tested on target platforms
+- [ ] Installer/executable tested
+- [ ] Release notes prepared
+
+## Build Commands
+
+### Development Build
+```bash
+# Add your development build command
+```
+
+### Production Build
+```bash
+pyinstaller pyinstaller/app.spec
+```
+
+### Testing Build
+```bash
+# Run the built executable
+./dist/app  # or dist\app.exe on Windows
+```
+
+## Distribution Notes
+
+- Minimum system requirements
+- Known platform-specific issues
+- Installation instructions
+EOF
+
+# Create version tracking file
+cat > build_tracking/VERSION_HISTORY.md << 'EOF'
+# Version History
+
+## Version Tracking
+
+| Version | Date | Type | Description |
+|---------|------|------|-------------|
+| 0.1.0 | YYYY-MM-DD | Initial | Initial release |
+
+## Version Numbering
+
+Following [Semantic Versioning](https://semver.org/):
+- MAJOR: Incompatible API changes
+- MINOR: Backwards-compatible functionality
+- PATCH: Backwards-compatible bug fixes
+
+## Release Process
+
+1. Update version in `app/config/settings.py`
+2. Update `CHANGELOG.md`
+3. Update this file
+4. Create git tag: `git tag -a v0.1.0 -m "Release version 0.1.0"`
+5. Build release: `pyinstaller pyinstaller/app.spec`
+6. Test executable
+7. Push tag: `git push origin v0.1.0`
+8. Create GitHub release (if applicable)
+EOF
+
+# Create logs .gitkeep
+cat > logs/.gitkeep << 'EOF'
+# This file ensures the logs directory is tracked by git
+# Log files themselves should be in .gitignore
 EOF
 
 echo -e "${GREEN}✓ Project structure created${NC}"
 echo -e "${GREEN}✓ Starter files generated${NC}"
+echo -e "${GREEN}✓ Documentation templates created${NC}"
+echo -e "${GREEN}✓ Logging configuration added${NC}"
+echo -e "${GREEN}✓ Build tracking templates created${NC}"
 echo ""
 
 # ===========================
