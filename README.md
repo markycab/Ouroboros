@@ -66,6 +66,10 @@ your_new_project/
 ├── build_tracking/             # Build history and versions
 │   ├── BUILD_LOG.md
 │   └── VERSION_HISTORY.md
+├── templates/                  # Jinja2 templates (if enabled)
+│   ├── README.md
+│   └── reports/
+│       └── example_report.html
 ├── pyinstaller/
 │   └── app.spec                # PyInstaller configuration
 ├── CHANGELOG.md
@@ -131,6 +135,14 @@ your_new_project/
 - python-dotenv (environment variables)
 - loguru (enhanced logging)
 - pydantic (data validation)
+
+**Document Generation:**
+
+- Jinja2 (template engine)
+- python-docx (Word documents)
+- reportlab (PDF generation)
+- weasyprint (HTML to PDF with CSS)
+- markdown (Markdown to HTML)
 
 **Testing:**
 
@@ -208,6 +220,22 @@ Result: PyQt6 project with GUI structure, executable builder configuration, and 
 ```
 
 Result: Professional CLI application with beautiful terminal output and data processing capabilities.
+
+### Example 4: Document Generation with Jinja2
+
+```bash
+./init_project.sh
+
+# Select:
+# - Project Type: Console App (CLI)
+# - Document Generation: Yes
+# - Jinja2: Yes
+# - python-docx: Yes
+# - weasyprint: Yes
+# - Testing: pytest
+```
+
+Result: Application with template-based document generation, supporting HTML templates, Word documents, and PDF export.
 
 ## 📝 Script Workflow
 
