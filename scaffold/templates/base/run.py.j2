@@ -1,0 +1,19 @@
+from app.utils.logger import setup_logger
+
+logger = setup_logger(__name__)
+
+def run_cli() -> None:
+    logger.info("CLI mode started")
+    print("Hello from CLI mode!")
+    logger.info("CLI mode finished")
+
+def main() -> None:
+    try:
+        from ui.main_window import run_gui
+        run_gui()
+    except Exception as e:
+        logger.warning(f"GUI not started; falling back to CLI. Reason: {e}")
+        run_cli()
+
+if __name__ == "__main__":
+    main()

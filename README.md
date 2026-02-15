@@ -1,24 +1,23 @@
-# Python Project Setup Assistant
+# Ouroboros
 
-An interactive, bash script for quickly scaffolding production-ready Python projects with intelligent defaults based on project type.
+An interactive Python-based project scaffolding wizard that quickly generates production-ready Python projects with intelligent defaults based on project archetype.
 
 ## 🎯 Features
 
-- **Interactive Setup** - Beautiful, colorful CLI with guided prompts
-- **Project Type Detection** - Smart defaults based on whether you're building:
-  - Console Applications (CLI)
-  - Desktop GUI Applications
-  - Web Applications (Backend/API)
-  - Mobile Applications
-  - Python Libraries/Packages
+- **Interactive Wizard** - Beautiful, colorful CLI with guided prompts
+- **Archetype-Based Templates** - Smart defaults for common project types:
+  - **GUI** - Desktop GUI Applications
+  - **CLI** - Console/Command-line Applications  
+  - **Web** - Web Applications (Backend/API)
+  - **Lib** - Python Libraries/Packages
+- **Jinja2 Template System** - Flexible template-based project generation
 - **Intelligent Package Selection** - Context-aware recommendations for frameworks and tools
-- **Complete Project Structure** - Automatically generates a well-organized folder hierarchy
-- **Development Tools** - Testing, linting, formatting, and type checking setup
-- **Documentation Templates** - Ready-to-use docs, changelog, and contributing guidelines
-- **Logging Infrastructure** - Pre-configured logging system with daily log rotation
-- **Build Tracking** - Templates for tracking builds, versions, and releases
-- **Virtual Environment** - Optional venv creation and activation
-- **Git Integration** - Repository initialization with comprehensive .gitignore
+- **Add-ons System** - Modular package bundles (data, visualization, docs, HTTP, config, database)
+- **Development Bundles** - Pre-configured dev tool sets (standard, minimal, strict)
+- **Modern Python** - Uses pyproject.toml for project configuration
+- **Virtual Environment** - Optional venv creation
+- **Git Integration** - Optional repository initialization
+- **Self-Destruct Pattern** - Optionally removes scaffold code after generation
 
 ## 🚀 Quick Start
 
@@ -29,282 +28,298 @@ An interactive, bash script for quickly scaffolding production-ready Python proj
    cd Ouroboros
    ```
 
-3. **Run the script**:
+3. **Run the bootstrap script**:
 
    ```bash
-   bash init_project.sh
+   ./bootstrap.sh       # Linux/macOS/Git Bash
    ```
 
-4. **Follow the prompts** to configure your project
+   or
+
+   ```powershell
+   ./bootstrap.ps1      # Windows PowerShell
+   ```
+
+4. **Follow the interactive prompts** to configure your project
 
 ## 📋 What Gets Created
 
 ### Project Structure
 
+The wizard generates a well-organized project using Jinja2 templates. The structure varies by archetype:
+
+**Base Structure** (all archetypes):
+
 ```text
 your_new_project/
-├── app/
-│   ├── main.py                 # Entry point with logging
-│   ├── engine/                 # Core business logic (UI-agnostic)
-│   │   ├── workflows.py
-│   │   ├── calculations.py
-│   │   └── models.py
+├── app/                        # Main application package
+│   ├── __init__.py
+│   ├── config/
+│   │   └── __init__.py
+│   ├── engine/                 # Core business logic
+│   │   └── __init__.py
 │   ├── services/               # I/O, DB, filesystem, APIs
-│   ├── config/                 # Configuration management
-│   │   └── settings.py
+│   │   └── __init__.py
 │   └── utils/
+│       ├── __init__.py
 │       └── logger.py           # Logging configuration
-├── cli/
-│   ├── commands.py             # CLI framework integration
-│   └── formatters.py
-├── ui/
-│   ├── widgets/             # GUI widgets
-│   └── assets/              # Images, icons, stylesheets
 ├── tests/
-│   └── test_example.py
-├── docs/
-│   ├── README.md
-│   └── ARCHITECTURE.md
-├── logs/                       # Application logs
-├── build_tracking/             # Build history and versions
-│   ├── BUILD_LOG.md
-│   └── VERSION_HISTORY.md
-├── templates/                  # Jinja2 templates (if enabled)
-│   ├── README.md
-│   └── reports/
-│       └── example_report.html
-├── pyinstaller/
-│   └── app.spec                # PyInstaller configuration
-├── CHANGELOG.md
-├── CONTRIBUTING.md
-├── README.md                   # Project README
-├── pyproject.toml
-├── requirements.txt
-└── .gitignore
+│   └── test_smoke.py
+├── logs/                       # Application logs directory
+├── pyproject.toml              # Modern Python project config
+├── README.md
+└── run.py                      # Entry point
 ```
 
-### Documentation Files
+**Additional for GUI archetype:**
 
-- **README.md** - Complete project documentation
-- **ARCHITECTURE.md** - System design and architecture
-- **CHANGELOG.md** - Version history
-- **CONTRIBUTING.md** - Contribution guidelines
-- **BUILD_LOG.md** - Build history and checklist
-- **VERSION_HISTORY.md** - Version tracking
+```text
+├── ui/
+│   └── main_window.py          # GUI main window
+```
 
-## 🎨 Package Categories
+**Additional for CLI archetype:**
 
-### Framework Selection (Based on Project Type)
+```text
+├── ui/
+│   └── main_window.py          # CLI interface
+```
 
-**Console Apps:**
+**Additional for Web archetype:**
 
-- CLI frameworks: click, typer, argparse, fire
-- Rich (beautiful terminal output)
+```text
+├── ui/
+│   └── main_window.py          # Web routes/views
+```
 
-**Desktop GUI:**
+**Optional**: If `use_src_layout` is enabled, the main package is placed under a `src/` directory (recommended for libraries)
 
-- GUI frameworks: tkinter, PyQt5, PyQt6, PySide6, Kivy
-- Executable builders: PyInstaller, cx_Freeze, py2exe
+## 🎨 Configuration Options
 
-**Web Apps:**
+### Archetypes
 
-- Web frameworks: FastAPI, Flask, Django, Sanic
-- ORMs: SQLAlchemy, Flask-SQLAlchemy
-- Extensions: Flask-CORS, Django REST framework
+Choose from 4 project archetypes:
 
-**Mobile Apps:**
+- **gui** - Desktop GUI applications
+- **cli** - Command-line/console applications
+- **web** - Web applications and APIs
+- **lib** - Python libraries and packages
 
-- Frameworks: Kivy, BeeWare Briefcase, PyQt for Android
-- Build tools: Buildozer, python-for-android
+### GUI Frameworks (for GUI archetype)
 
-**Libraries:**
+- **PyQt6** - Modern Qt bindings
+- **PySide6** - Official Qt bindings
+- **PyQt5** - Mature Qt bindings
+- **tkinter** - Built-in Python GUI (no install needed)
+- **Kivy** - Cross-platform including mobile
 
-- Build tools: build, twine
-- Version management: setuptools-scm
+Optional: Add PyInstaller for building standalone executables
 
-### Additional Packages (All Project Types)
+### Add-ons
 
-**Data Visualization:**
+Modular package bundles you can enable:
 
-- matplotlib, seaborn, plotly
+- **data** - Data tools (numpy, pandas, openpyxl) - *recommended*
+- **viz** - Visualization (matplotlib, plotly)
+- **docs** - Document generation (jinja2, python-docx, reportlab)
+- **http** - HTTP client (requests)
+- **config** - Environment config (python-dotenv) - *recommended*
+- **db** - Database ORM (sqlalchemy)
 
-**Data Processing:**
+### Development Tool Bundles
 
-- pandas, numpy, openpyxl
+Choose a dev tools configuration:
 
-**Utilities:**
+- **standard** - pytest+cov, ruff, mypy - *recommended*
+- **minimal** - pytest only
+- **strict** - pytest+cov, ruff, black, mypy (maximum rigor)
 
-- requests (HTTP library)
-- python-dotenv (environment variables)
-- loguru (enhanced logging)
-- pydantic (data validation)
+### Project Options
 
-**Document Generation:**
-
-- Jinja2 (template engine)
-- python-docx (Word documents)
-- reportlab (PDF generation)
-- weasyprint (HTML to PDF with CSS)
-- markdown (Markdown to HTML)
-
-**Testing:**
-
-- pytest (with pytest-cov, pytest-mock)
-- unittest (built-in)
-- nose2
-
-**Type Checking:**
-
-- mypy, pyright, pyre-check
-
-**Code Quality:**
-
-- black (formatter)
-- flake8 (linter)
-- pylint (linter)
-- isort (import sorter)
-- autopep8 (PEP8 formatter)
+- **Use src/ layout** - Package under src/ directory (recommended for libraries)
+- **Create venv** - Create virtual environment in new project
+- **Initialize git** - Initialize git repository
+- **Self-destruct** - Remove scaffold/ folder after generation (Pattern A)
 
 ## 🛠️ Requirements
 
-- **Bash** (Git Bash on Windows, or native on Linux/macOS)
-- **Python 3.8+**
+- **Python 3.10+** (required for the scaffold tool)
 - **pip** (Python package manager)
-- **Git** (optional, for repository initialization)
+- **Git** (optional, for repository initialization in generated projects)
 
 ## 💡 Usage Examples
 
-### Example 1: FastAPI Web Application
+### Example 1: GUI Application with PyQt6
 
 ```bash
-./init_project.sh
+./bootstrap.sh
 
-# Select:
-# - Project Type: Web App (Backend/API)
-# - Framework: FastAPI
-# - Install SQLAlchemy: Yes
-# - Testing: pytest
-# - Type Checking: mypy
-# - Linting: black + flake8
-# - Virtual Environment: Yes
-# - Git: Yes
+# Wizard prompts:
+# - Project display name: My GUI App
+# - Project slug: my-gui-app
+# - Package name: my_gui_app
+# - Archetype: gui
+# - GUI Framework: PyQt6
+# - Add PyInstaller: Yes
+# - Add-ons: data (yes), config (yes)
+# - Dev bundle: standard
+# - Use src/ layout: No
+# - Create venv: Yes
+# - Initialize git: Yes
+# - Self-destruct: Yes
 ```
 
-Result: Complete FastAPI project with API structure, database ORM, testing suite, and documentation.
+Result: Complete PyQt6 project with data tools, professional structure, and testing.
 
-### Example 2: Desktop GUI with PyQt
+### Example 2: CLI Application
 
 ```bash
-./init_project.sh
+./bootstrap.sh
 
-# Select:
-# - Project Type: Desktop GUI App
-# - Framework: PyQt6
-# - Executable Builder: PyInstaller
-# - Data Visualization: matplotlib
-# - Testing: pytest
-# - Virtual Environment: Yes
+# Wizard prompts:
+# - Project display name: Data Processor
+# - Archetype: cli
+# - Add-ons: data (yes), http (yes), config (yes)
+# - Dev bundle: standard
+# - Create venv: Yes
 ```
 
-Result: PyQt6 project with GUI structure, executable builder configuration, and plotting capabilities.
+Result: CLI application with data processing capabilities and HTTP client.
 
-### Example 3: CLI Tool with Rich Output
+### Example 3: Web API
 
 ```bash
-./init_project.sh
+./bootstrap.sh
 
-# Select:
-# - Project Type: Console App (CLI)
-# - CLI Framework: click
-# - Rich Terminal: Yes
-# - Data Processing: pandas + numpy
-# - Testing: pytest
-# - Linting: black + flake8
+# Wizard prompts:
+# - Project display name: My API
+# - Archetype: web
+# - Add-ons: db (yes), config (yes)
+# - Dev bundle: strict
+# - Create venv: Yes
 ```
 
-Result: Professional CLI application with beautiful terminal output and data processing capabilities.
+Result: Web application structure with database ORM and strict linting.
 
-### Example 4: Document Generation with Jinja2
+### Example 4: Python Library
 
 ```bash
-./init_project.sh
+./bootstrap.sh
 
-# Select:
-# - Project Type: Console App (CLI)
-# - Document Generation: Yes
-# - Jinja2: Yes
-# - python-docx: Yes
-# - weasyprint: Yes
-# - Testing: pytest
+# Wizard prompts:
+# - Project display name: My Library
+# - Archetype: lib
+# - Add-ons: (select as needed)
+# - Dev bundle: standard
+# - Use src/ layout: Yes (recommended for libraries)
+# - Create venv: Yes
 ```
 
-Result: Application with template-based document generation, supporting HTML templates, Word documents, and PDF export.
+Result: Library project with src/ layout, ready for packaging and distribution.
 
-## 📝 Script Workflow
+## 📝 Wizard Workflow
 
-1. **Welcome Banner** - Displays project setup assistant
-2. **Project Type** - Select application type (Console/GUI/Web/Mobile/Library)
-3. **Framework Selection** - Choose relevant frameworks based on type
-4. **Production Packages** - Data processing, visualization, utilities
-5. **Development Packages** - Testing, type checking, linting
-6. **Environment Setup** - Virtual environment and Git initialization
-7. **Structure Creation** - Generate complete folder structure with templates
-8. **Package Installation** - Install all selected dependencies
-9. **Summary** - Display next steps and activation instructions
+1. **Banner** - Displays the Ouroboros scaffolding wizard
+2. **Project Identity** - Name, slug, and package name
+3. **Archetype Selection** - Choose project type (gui/cli/web/lib)
+4. **Framework Selection** - GUI framework selection (GUI archetype only)
+5. **Add-ons** - Select additional package bundles
+6. **Development Tools** - Choose dev tool bundle
+7. **Project Options** - src/ layout, venv, git, self-destruct
+8. **Generation** - Renders Jinja2 templates to create project structure
+9. **Summary** - Displays project location and next steps
+
+## 🎯 Architecture
+
+The Ouroboros scaffold tool is structured as follows:
+
+- **scaffold/\_\_main\_\_.py** - Entry point, orchestrates the workflow
+- **scaffold/wizard.py** - Interactive wizard that collects configuration
+- **scaffold/config.py** - ProjectConfig dataclass definition
+- **scaffold/presets.py** - Archetype, framework, and package definitions
+- **scaffold/cli\_ui.py** - Beautiful terminal UI components
+- **scaffold/deps.py** - Dependency resolution logic
+- **scaffold/actions.py** - Project scaffolding execution
+- **scaffold/render.py** - Jinja2 template rendering engine
+- **scaffold/prompts.py** - Utility functions for user input
+- **scaffold/templates/** - Jinja2 templates organized by archetype
+  - **base/** - Common templates for all archetypes
+  - **gui/** - GUI-specific templates
+  - **cli/** - CLI-specific templates  
+  - **web/** - Web-specific templates
+  - **lib/** - Library-specific templates
 
 ## 🎯 Best Practices
 
-The generated projects follow these principles:
+Generated projects follow these principles:
 
-- **Separation of Concerns** - UI logic separated from business logic
+- **Separation of Concerns** - UI logic separated from business logic  
 - **Testability** - Core logic is framework-agnostic
 - **Modularity** - Loosely coupled components
-- **Documentation** - Comprehensive docs and inline comments
-- **Code Quality** - Pre-configured linting and formatting
-- **Type Safety** - Type hints and static type checking
-- **Logging** - Centralized logging with file rotation
-- **Version Control** - Git with sensible .gitignore
+- **Modern Python** - Uses pyproject.toml and current best practices
+- **Code Quality** - Pre-configured linting and formatting via dev bundles
+- **Type Safety** - Type hints with static type checking (mypy)
+- **Logging** - Centralized logging infrastructure
 
 ## 🔧 Customization
 
-You can modify the script to:
+You can extend Ouroboros by modifying:
 
-- Add more framework options
-- Include additional package categories
-- Change default selections
-- Customize folder structure
-- Add custom templates
+- **scaffold/presets.py** - Add archetypes, frameworks, add-ons, or dev bundles
+- **scaffold/templates/** - Customize or add new Jinja2 templates
+- **scaffold/deps.py** - Modify dependency resolution logic
+- **scaffold/cli_ui.py** - Enhance the terminal UI
 
-Simply edit `init_project.sh` and add your preferences.
+### Adding a New Archetype
+
+1. Add archetype name to `ARCHETYPES` list in presets.py
+2. Create template directory under `scaffold/templates/<archetype>/`
+3. Add archetype handling in deps.py if needed
+4. Update the Archetype type hint in config.py
+
+### Adding a New Add-on
+
+Add to the `ADDONS` list in presets.py:
+
+```python
+("key", "Description", ["package1", "package2"], default_bool)
+```
 
 ## 📖 Generated Project Usage
 
-After running the script, activate your environment and start coding:
+After the wizard completes, navigate to your new project:
 
 ```bash
-# Activate virtual environment
-source venv/bin/activate  # Linux/macOS
-venv\Scripts\activate     # Windows
+cd ../your-project-slug
+
+# Activate virtual environment (if created)
+source .venv/bin/activate  # Linux/macOS/Git Bash
+.venv\Scripts\activate     # Windows CMD
+.venv\Scripts\Activate.ps1 # Windows PowerShell
+
+# Install dependencies (add to pyproject.toml first)
+pip install -e .
 
 # Run your application
-python app/main.py
+python run.py
 
-# Development commands
+# Development commands (if using standard/strict dev bundle)
 pytest                    # Run tests
-black .                   # Format code
-flake8 .                  # Lint code
-mypy app/ cli/            # Type check
+pytest --cov=app          # Run tests with coverage
+ruff check .              # Lint code
+mypy app/                 # Type check
+black .                   # Format code (if using strict bundle)
 ```
 
 ## 🤝 Contributing
 
-Contributions are welcome! Feel free to:
+Contributions are welcome! You can:
 
-- Report bugs
-- Suggest new features
-- Add framework options
+- Report bugs or suggest features via issues
+- Add new archetypes or frameworks
 - Improve templates
-- Enhance documentation
+- Enhance the wizard UI
+- Improve documentation
 
 ## 📜 License
 
@@ -312,7 +327,9 @@ This project is open source and available for anyone to use and modify.
 
 ## 🙏 Acknowledgments
 
-Inspired by the T3 Stack's create-t3-app, bringing similar interactive setup experience to Python projects.
+Inspired by modern project scaffolding tools like create-t3-app, bringing an interactive, opinionated setup experience to Python projects.
+
+The name "Ouroboros" (the serpent eating its own tail) reflects the self-referential nature of the tool - it's a Python project that creates Python projects and can optionally remove itself after generation (the self-destruct pattern).
 
 ---
 

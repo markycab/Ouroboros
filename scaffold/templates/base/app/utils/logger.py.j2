@@ -1,0 +1,139 @@
+"""
+Universal logging setup for the application.
+
+Design goals:
+- Safe to import anywhere (no side effects at import time)
+- One-time configuration
+- Works for CLI, GUI, Web, and libraries
+- Console + rotating file logging
+"""
+
+from __future__ import annotations
+
+import logging
+from logging.handlers import RotatingFileHandler
+from pathlib import Path
+from typing import Optional
+
+
+# ---------------------------
+# Defaults (can be overridden)
+# ---------------------------
+
+DEFAULT_LEVEL = logging.INFO
+DEFAULT_FORMAT = "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"
+DEFAULT_DATEFMT = "%Y-%m-%d %H:%M:%S"
+
+LOG_DIR_NAME = "logs"
+LOG_FILE_NAME = "app.log"
+MAX_BYTES = 5 * 1024 * 1024      # 5 MB
+BACKUP_COUNT = 5                # keep last 5 files
+
+
+# ---------------------------
+# Internal state
+# ---------------------------
+
+_CONFIGURED = False
+
+
+# ---------------------------
+# Public API
+# ---------------------------
+
+def get_logger(
+    name: str,
+    *,
+    level: int = DEFAULT_LEVEL,
+) -> logging.Logger:
+    """
+    Get a logger for a module or component.
+
+    Example:
+        logger = get_logger(__name__)
+        logger.info("Hello")
+
+    Args:
+        name: Usually __name__
+        level: Logging level (default: INFO)
+
+    Returns:
+        logging.Logger
+    """
+    _ensure_configured(level=level)
+    return logging.getLogger(name)
+
+
+def configure_logging(
+    *,
+    level: int = DEFAULT_LEVEL,
+    log_dir: Optional[Path] = None,
+    console: bool = True,
+    file: bool = True,
+) -> None:
+    """
+    Configure global logging.
+
+    Safe to call multiple times (only first call has effect).
+
+    Args:
+        level: Root logging level
+        log_dir: Directory for log files (default: <project_root>/logs)
+        console: Enable console logging
+        file: Enable file logging
+    """
+    global _CONFIGURED
+    if _CONFIGURED:
+        return
+
+    root = logging.getLogger()
+    root.setLevel(level)
+
+    formatter = logging.Formatter(
+        fmt=DEFAULT_FORMAT,
+        datefmt=DEFAULT_DATEFMT,
+    )
+
+    if console:
+        ch = logging.StreamHandler()
+        ch.setLevel(level)
+        ch.setFormatter(formatter)
+        root.addHandler(ch)
+
+    if file:
+        log_dir = log_dir or _default_log_dir()
+        log_dir.mkdir(parents=True, exist_ok=True)
+
+        fh = RotatingFileHandler(
+            log_dir / LOG_FILE_NAME,
+            maxBytes=MAX_BYTES,
+            backupCount=BACKUP_COUNT,
+            encoding="utf-8",
+        )
+        fh.setLevel(level)
+        fh.setFormatter(formatter)
+        root.addHandler(fh)
+
+    _CONFIGURED = True
+
+
+# ---------------------------
+# Helpers
+# ---------------------------
+
+def _ensure_configured(level: int) -> None:
+    """
+    Configure logging with defaults if not yet configured.
+    """
+    if not _CONFIGURED:
+        configure_logging(level=level)
+
+
+def _default_log_dir() -> Path:
+    """
+    Resolve <project_root>/logs safely.
+
+    Works even if imported deep inside the package.
+    """
+    # app/utils/logger.py -> app/utils -> app -> project root
+    return Path(__file__).resolve().parents[3] / LOG_DIR_NAME
