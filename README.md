@@ -57,6 +57,9 @@ your_new_project/
 ├── cli/
 │   ├── commands.py             # CLI framework integration
 │   └── formatters.py
+├── ui/
+│   ├── widgets/             # GUI widgets
+│   └── assets/              # Images, icons, stylesheets
 ├── tests/
 │   └── test_example.py
 ├── docs/
