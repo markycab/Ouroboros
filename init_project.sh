@@ -694,6 +694,15 @@ fi
 # ===========================
 echo -e "${BLUE}Creating project folder structure...${NC}"
 
+# Detect whether a GUI framework was selected
+GUI_SELECTED=false
+if [[ " ${SELECTED_PACKAGES[@]} " =~ " PyQt5 " ]] || \
+   [[ " ${SELECTED_PACKAGES[@]} " =~ " PyQt6 " ]] || \
+   [[ " ${SELECTED_PACKAGES[@]} " =~ " PySide6 " ]] || \
+   [[ " ${SELECTED_PACKAGES[@]} " =~ " kivy " ]]; then
+  GUI_SELECTED=true
+fi
+
 # Create main directories
 mkdir -p app/engine
 mkdir -p app/services
