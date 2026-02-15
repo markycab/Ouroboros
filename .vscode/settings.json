@@ -1,5 +1,9 @@
 {
   "python.defaultInterpreterPath": "${workspaceFolder}\\venv\\Scripts\\python.exe",
   "python.testing.pytestEnabled": true,
-  "python.testing.pytestArgs": ["tests"]
+  "python.testing.pytestArgs": ["tests"],
+  "python.analysis.exclude": ["**/scaffold/templates/**"],
+  "files.readonlyInclude": {
+    "**/scaffold/templates/**": true
+  }
 }

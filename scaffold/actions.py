@@ -11,6 +11,15 @@ def scaffold_project(cfg: ProjectConfig, repo_root: Path) -> Path:
     """
     Creates a new project folder *next to* the template repo root.
     """
+    # SAFETY: refuse to scaffold into the template repo itself
+    marker = repo_root / ".template-repo"
+    if marker.exists():
+        raise RuntimeError(
+            "This is the TEMPLATE repository.\n"
+            "Scaffolding into the template itself is not allowed.\n"
+            "Create a new repo from the template or run the generator externally."
+        )
+        
     target = repo_root.parent / cfg.project_slug
     target.mkdir(parents=True, exist_ok=True)
 

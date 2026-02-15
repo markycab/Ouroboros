@@ -1,4 +1,23 @@
-# Ouroboros
+# ⚠️ TEMPLATE REPOSITORY — DO NOT USE AS A PROJECT
+
+This repository is a **project template and scaffold generator**.
+
+❌ Do NOT:
+
+- write application code here
+- add business logic here
+- treat this as a runnable app
+
+✅ Correct usage:
+
+1. Click **Use this template** on GitHub
+2. Clone the newly created repo
+3. Run:
+
+   ```bash
+   python -m scaffold
+
+## Project Overview: Ouroboros
 
 An interactive Python-based project scaffolding wizard that quickly generates production-ready Python projects with intelligent defaults based on project archetype.
 
