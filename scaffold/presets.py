@@ -1,6 +1,9 @@
-ARCHETYPES = ["gui", "cli", "web", "lib"]
+from __future__ import annotations
+from typing import Final
 
-GUI_FRAMEWORKS = [ # type: ignore
+ARCHETYPES: Final[list[str]] = ["gui", "cli", "web", "lib"]
+
+GUI_FRAMEWORKS: Final[list[tuple[str, list[str]]]] = [
     ("PyQt6", ["PyQt6"]),
     ("PySide6", ["PySide6"]),
     ("PyQt5", ["PyQt5"]),
@@ -8,7 +11,8 @@ GUI_FRAMEWORKS = [ # type: ignore
     ("Kivy", ["kivy"]),
 ]
 
-ADDONS = [
+# (key, label, packages, default_selected)
+ADDONS: Final[list[tuple[str, str, list[str], bool]]] = [
     ("data", "Data tools (numpy, pandas, openpyxl)", ["numpy", "pandas", "openpyxl"], True),
     ("viz", "Visualization (matplotlib, plotly)", ["matplotlib", "plotly"], False),
     ("docs", "Document generation (jinja2, python-docx, reportlab)", ["jinja2", "python-docx", "reportlab"], False),
@@ -17,7 +21,8 @@ ADDONS = [
     ("db", "Database ORM (sqlalchemy)", ["sqlalchemy"], False),
 ]
 
-DEV_BUNDLES = [
+# (key, label, packages, default_selected)
+DEV_BUNDLES: Final[list[tuple[str, str, list[str], bool]]] = [
     ("standard", "pytest+cov, ruff, mypy", ["pytest", "pytest-cov", "ruff", "mypy"], True),
     ("minimal", "pytest only", ["pytest"], False),
     ("strict", "pytest+cov, ruff, black, mypy", ["pytest", "pytest-cov", "ruff", "black", "mypy"], False),
