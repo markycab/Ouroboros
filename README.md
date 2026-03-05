@@ -85,6 +85,10 @@ your_new_project/
 ├── tests/
 │   └── test_smoke.py
 ├── logs/                       # Application logs directory
+├── requirements/               # Generated dependency files (when selected)
+│   ├── base.txt
+│   ├── dev.txt
+│   └── all.txt
 ├── pyproject.toml              # Modern Python project config
 ├── README.md
 └── run.py                      # Entry point
@@ -157,6 +161,7 @@ Choose a dev tools configuration:
 
 - **Use src/ layout** - Package under src/ directory (recommended for libraries)
 - **Create venv** - Create virtual environment in new project
+- **Install dependencies** - Run pip install automatically after generation
 - **Initialize git** - Initialize git repository
 - **Self-destruct** - Remove scaffold/ folder after generation (Pattern A)
 
@@ -316,7 +321,10 @@ source .venv/bin/activate  # Linux/macOS/Git Bash
 .venv\Scripts\activate     # Windows CMD
 .venv\Scripts\Activate.ps1 # Windows PowerShell
 
-# Install dependencies (add to pyproject.toml first)
+# Install dependencies (generated from wizard selections)
+pip install -r requirements/all.txt
+
+# Optional editable install if you also manage dependencies in pyproject.toml
 pip install -e .
 
 # Run your application

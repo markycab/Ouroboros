@@ -11,6 +11,7 @@ class ProjectConfig:
     archetype: Archetype
     use_src_layout: bool
     create_venv: bool
+    install_deps: bool
     init_git: bool
     self_destruct: bool        # Pattern A option: delete scaffold after generation
     extra_packages: List[str]

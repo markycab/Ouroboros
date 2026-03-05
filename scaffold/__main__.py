@@ -9,8 +9,9 @@ def main() -> None:
     print(f"\n✅ Created project at: {out}")
     print("Next:")
     print(f"  cd {out}")
-    if (out / ".venv").exists():
+    if (out / ".venv").exists() and not cfg.install_deps:
         print("  # activate venv then install deps")
+        print("  pip install -r requirements/all.txt")
     print("  code .")
 
 if __name__ == "__main__":

@@ -62,6 +62,7 @@ def collect_config() -> ProjectConfig:
     section("Project Options")
     use_src = ask_yes_no("Use src/ layout?", default=(archetype == "lib"))
     create_venv = ask_yes_no("Create venv in new project?", default=True)
+    install_deps = ask_yes_no("Install dependencies with pip after generation?", default=True)
     init_git = ask_yes_no("Initialize git in new project?", default=True)
     self_destruct = ask_yes_no("Remove scaffold/ after generation (Pattern A)?", default=True)
 
@@ -72,6 +73,7 @@ def collect_config() -> ProjectConfig:
         archetype=archetype,  # must match your Archetype Literal
         use_src_layout=use_src,
         create_venv=create_venv,
+        install_deps=install_deps,
         init_git=init_git,
         self_destruct=self_destruct,
         extra_packages=deps,
